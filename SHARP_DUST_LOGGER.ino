@@ -4,6 +4,7 @@
 #include "Biquad.h"
 #include <Wire.h>
 #include <SD.h>
+#include "Biquad.h"
 
 #define SD_CS 4
 
@@ -41,6 +42,7 @@ float dustDensity = 0;
 // ------------------
 
 Biquad lpFilter(bq_type_lowpass, 0.2 / samplingFreq, 0.707, 0);
+Biquad lpFilter25(bq_type_lowpass, 0.2, 0.707, 0);
 
 void setup()
 {
@@ -55,10 +57,6 @@ void setup()
   if (sdReady)
   {
     SD.mkdir("/DATA");
-    DateTime now = rtc.now();
-    sprintf(filePath, "/DATA/%04d%02d%02d.csv", now.year(), now.month(), now.day());
-    logFile = SD.open(filePath, FILE_WRITE);
-    logFile.close();
   }
 
   pinMode(SHARP_LED_POWER, OUTPUT);
@@ -118,6 +116,7 @@ void loop()
     dustDensity = (0.17 * ((sumValue/measurementsCount) * (5.0 / 1024)) - 0.1)*1000; // ug/m3
 
     DateTime now = rtc.now();
+    sprintf(filePath, "/DATA/%04d%02d%02d.csv", now.year(), now.month(), now.day());
 
     logFile = SD.open(filePath, FILE_WRITE);
 
@@ -131,8 +130,9 @@ void loop()
       logFile.print(dataBuf);
       logFile.print(",");
 
-      dtostrf(dustDensity, 2, 1, dataBuf);
-      logFile.println(dataBuf);
+      logFile.print(dustDensity, 2);
+      logFile.print(",");
+      logFile.println(lpFilter25.process(dustDensity), 2);
       logFile.close();
     }
     else
