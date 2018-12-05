@@ -43,6 +43,7 @@ float dustDensity = 0;
 
 Biquad lpFilter(bq_type_lowpass, 0.2 / samplingFreq, 0.707, 0);
 Biquad lpFilter25(bq_type_lowpass, 0.2, 0.707, 0);
+Biquad lpFilter002(bq_type_lowpass, 0.02, 0.707, 0);
 
 void setup()
 {
@@ -132,7 +133,10 @@ void loop()
 
       logFile.print(dustDensity, 2);
       logFile.print(",");
-      logFile.println(lpFilter25.process(dustDensity), 2);
+      logFile.print(lpFilter25.process(dustDensity), 2);
+      logFile.print(",");
+      logFile.println(lpFilter002.process(dustDensity), 2);
+
       logFile.close();
     }
     else
