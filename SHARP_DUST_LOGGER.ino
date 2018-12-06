@@ -20,7 +20,7 @@ char dataBuf[12];
 bool sdReady = false;
 
 // begin sharp sensor
-int measurePin = A6;
+int SHARP_ADC_PIN = A6;
 int SHARP_LED_POWER = 3;
 
 int samplingTime = 280;
@@ -28,8 +28,9 @@ int deltaTime = 40;
 
 int samplingFreq = 10;
 
-volatile float rawValue = 0;
+volatile int rawValue = 0;
 volatile bool dataReady = false;
+volatile bool adcStarted = false;
 
 float filteredValue = 0;
 float sumValue = 0;
@@ -43,6 +44,8 @@ float dustDensity = 0;
 
 Biquad lpFilter(bq_type_lowpass, 0.2 / samplingFreq, 0.707, 0);
 Biquad lpFilter25(bq_type_lowpass, 0.2, 0.707, 0);
+Biquad lpFilter01(bq_type_lowpass, 0.1, 0.707, 0);
+Biquad lpFilter005(bq_type_lowpass, 0.05, 0.707, 0);
 Biquad lpFilter002(bq_type_lowpass, 0.02, 0.707, 0);
 
 void setup()
@@ -71,16 +74,43 @@ void setup()
 
   displayRefreshInterval = millis();
   sdLoggingInterval = millis();
+
+  // set the analog reference (high two bits of ADMUX) and select the
+  // channel (low 4 bits). this also sets ADLAR (left-adjust result)
+  // to 0 (the default).
+  ADMUX = bit (REFS0) | ((SHARP_ADC_PIN - PIN_A0) & 0x07);
 }
+
+// ADC complete Interupt Service Routine
+ISR (ADC_vect)
+{
+	byte low, high;
+	// read the result registers and store value in adcReading
+	// Must read ADCL first
+	low = ADCL;
+	high = ADCH;
+	rawValue = (high << 8) | low;
+	dataReady = true;
+}
+// end of ADC_vect
 
 void pollSensor(void)
 {
   digitalWrite(SHARP_LED_POWER,LOW); // power on the LED
   delayMicroseconds(samplingTime);
-  rawValue = analogRead(measurePin); // read the dust value
+  //rawValue = analogRead(measurePin); // read the dust value
+
+  // Check the conversion hasn't been started already
+  if (!adcStarted)
+  {
+  adcStarted = true;
+  // start the conversion
+  ADCSRA |= bit (ADSC) | bit (ADIE);
+  }
+
   delayMicroseconds(deltaTime);
   digitalWrite(SHARP_LED_POWER,HIGH); // turn the LED off
-  dataReady = true;
+  //dataReady = true;
 }
 
 void loop()
@@ -91,6 +121,7 @@ void loop()
     sumValue = sumValue + filteredValue;
     measurementsCount++;
     dataReady = false;
+    adcStarted = false;
   }
 
   if (millis() - displayRefreshInterval > 1000)
@@ -134,6 +165,10 @@ void loop()
       logFile.print(dustDensity, 2);
       logFile.print(",");
       logFile.print(lpFilter25.process(dustDensity), 2);
+      logFile.print(",");
+      logFile.print(lpFilter01.process(dustDensity), 2);
+      logFile.print(",");
+      logFile.print(lpFilter005.process(dustDensity), 2);
       logFile.print(",");
       logFile.println(lpFilter002.process(dustDensity), 2);
 
