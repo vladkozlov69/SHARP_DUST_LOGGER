@@ -25,9 +25,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/RTClib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/SD/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/U8g2/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/TimerOne}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/SPI/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/TimerOne}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.1942102039" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -39,9 +40,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/RTClib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/SD/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/U8g2/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/TimerOne}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/SPI/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/TimerOne}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.930124550" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -53,9 +55,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/RTClib}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/SD/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/U8g2/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/TimerOne}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/Wire}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/Wire/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/SPI/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/SHARP_DUST_LOGGER/libraries/TimerOne}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.849755354" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
@@ -81,4 +84,5 @@
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="refreshScope"/>
 </cproject>

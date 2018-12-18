@@ -22,18 +22,19 @@ bool sdReady = false;
 // begin sharp sensor
 int SHARP_ADC_PIN = A6;
 int SHARP_LED_POWER = 3;
+int ADC_DEBUG_PIN = 5;
 
 int samplingTime = 280;
 int deltaTime = 40;
 
-int samplingFreq = 10;
+int samplingFreq = 100;
 
 volatile int rawValue = 0;
 volatile bool dataReady = false;
 volatile bool adcStarted = false;
 
 float filteredValue = 0;
-float sumValue = 0;
+long sumValue = 0;
 int measurementsCount = 0;
 
 long displayRefreshInterval;
@@ -64,6 +65,7 @@ void setup()
   }
 
   pinMode(SHARP_LED_POWER, OUTPUT);
+  pinMode(ADC_DEBUG_PIN, OUTPUT);
 
   Timer1.initialize(1000000/samplingFreq);
   Timer1.attachInterrupt(pollSensor);
@@ -84,41 +86,47 @@ void setup()
 // ADC complete Interupt Service Routine
 ISR (ADC_vect)
 {
-	byte low, high;
-	// read the result registers and store value in adcReading
-	// Must read ADCL first
-	low = ADCL;
-	high = ADCH;
-	rawValue = (high << 8) | low;
+	rawValue = ADC;
+//	digitalWrite(ADC_DEBUG_PIN, LOW);
+	//digitalWrite(SHARP_LED_POWER,HIGH);
 	dataReady = true;
 }
 // end of ADC_vect
 
 void pollSensor(void)
 {
-  digitalWrite(SHARP_LED_POWER,LOW); // power on the LED
-  delayMicroseconds(samplingTime);
+
   //rawValue = analogRead(measurePin); // read the dust value
 
   // Check the conversion hasn't been started already
   if (!adcStarted)
   {
-  adcStarted = true;
-  // start the conversion
-  ADCSRA |= bit (ADSC) | bit (ADIE);
-  }
 
+  adcStarted = true;
+  digitalWrite(SHARP_LED_POWER,LOW); // power on the LED
+  delayMicroseconds(samplingTime);
+//  digitalWrite(ADC_DEBUG_PIN, HIGH);
+   // start the conversion
+  ADCSRA |= bit (ADSC) | bit (ADIE);
   delayMicroseconds(deltaTime);
   digitalWrite(SHARP_LED_POWER,HIGH); // turn the LED off
+  }
+
+
   //dataReady = true;
 }
 
 void loop()
 {
+	if (adcStarted && !dataReady)
+	{
+		return;
+	}
+
   if (dataReady)
   {
     filteredValue = lpFilter.process(rawValue);
-    sumValue = sumValue + filteredValue;
+    sumValue = sumValue + rawValue;
     measurementsCount++;
     dataReady = false;
     adcStarted = false;
@@ -131,21 +139,29 @@ void loop()
 
     // linear eqaution taken from http://www.howmuchsnow.com/arduino/airquality/
     // Chris Nafis (c) 2012
-    dustDensity = (0.17 * (filteredValue * (5.0 / 1024)) - 0.1)*1000; // ug/m3
+    dustDensity = constrain((0.17 * (filteredValue * (5.0 / 1024)) - 0.1)*1000, 0, 500); // ug/m3
 
     DateTime now = rtc.now();
     sprintf(dataBuf,"%02d:%02d:%02d", now.hour(), now.minute(), now.second());
     u8x8.drawString(0,1,dataBuf);
 
-    dtostrf(dustDensity, 2, 1, dataBuf);
-    u8x8.drawString(0,3,dataBuf);
+    u8x8.setCursor(0, 3);
+    u8x8.print(dustDensity, 3);
+    u8x8.setCursor(0, 4);
+    u8x8.print(filteredValue);
+    u8x8.setCursor(0, 5);
+    u8x8.print(rawValue);
+    u8x8.setCursor(0, 6);
+    u8x8.print(rawValue * (5.0 / 1024), 3);
 
     displayRefreshInterval = millis();
   }
 
   if (sdReady && (millis() - sdLoggingInterval > 60000))
   {
-    dustDensity = (0.17 * ((sumValue/measurementsCount) * (5.0 / 1024)) - 0.1)*1000; // ug/m3
+	  double voltage = sumValue * (5.0 / 1024)/measurementsCount;
+
+    dustDensity = 172 * voltage - 100; // ug/m3
 
     DateTime now = rtc.now();
     sprintf(filePath, "/DATA/%04d%02d%02d.csv", now.year(), now.month(), now.day());
@@ -170,7 +186,10 @@ void loop()
       logFile.print(",");
       logFile.print(lpFilter005.process(dustDensity), 2);
       logFile.print(",");
-      logFile.println(lpFilter002.process(dustDensity), 2);
+      logFile.print(lpFilter002.process(dustDensity), 2);
+      logFile.print(",");
+      logFile.println(voltage, 3);
+
 
       logFile.close();
     }
