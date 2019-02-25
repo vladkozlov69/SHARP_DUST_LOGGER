@@ -5,6 +5,7 @@
 #include <Wire.h>
 #include <SD.h>
 #include "Biquad.h"
+#include "MovingAverage.h"
 
 #define SD_CS 4
 
@@ -15,9 +16,11 @@ RTC_DS1307 rtc;
 
 File logFile;
 
-char filePath[25];
-char dataBuf[12];
+char filePath[30];
+char dataBuf[20];
 bool sdReady = false;
+
+MovingAverage ma(5);
 
 // begin sharp sensor
 int SHARP_ADC_PIN = A6;
@@ -37,17 +40,13 @@ float filteredValue = 0;
 long sumValue = 0;
 int measurementsCount = 0;
 
-long displayRefreshInterval;
 long sdLoggingInterval;
+long displayRefreshInterval;
 float dustDensity = 0;
 
 // ------------------
 
 Biquad lpFilter(bq_type_lowpass, 0.2 / samplingFreq, 0.707, 0);
-Biquad lpFilter25(bq_type_lowpass, 0.2, 0.707, 0);
-Biquad lpFilter01(bq_type_lowpass, 0.1, 0.707, 0);
-Biquad lpFilter005(bq_type_lowpass, 0.05, 0.707, 0);
-Biquad lpFilter002(bq_type_lowpass, 0.02, 0.707, 0);
 
 void setup()
 {
@@ -61,7 +60,7 @@ void setup()
 
   if (sdReady)
   {
-    SD.mkdir("/DATA");
+    SD.mkdir("/GP2Y1014");
   }
 
   pinMode(SHARP_LED_POWER, OUTPUT);
@@ -87,33 +86,23 @@ void setup()
 ISR (ADC_vect)
 {
 	rawValue = ADC;
-//	digitalWrite(ADC_DEBUG_PIN, LOW);
-	//digitalWrite(SHARP_LED_POWER,HIGH);
 	dataReady = true;
 }
 // end of ADC_vect
 
 void pollSensor(void)
 {
-
-  //rawValue = analogRead(measurePin); // read the dust value
-
-  // Check the conversion hasn't been started already
-  if (!adcStarted)
-  {
-
-  adcStarted = true;
-  digitalWrite(SHARP_LED_POWER,LOW); // power on the LED
-  delayMicroseconds(samplingTime);
-//  digitalWrite(ADC_DEBUG_PIN, HIGH);
-   // start the conversion
-  ADCSRA |= bit (ADSC) | bit (ADIE);
-  delayMicroseconds(deltaTime);
-  digitalWrite(SHARP_LED_POWER,HIGH); // turn the LED off
-  }
-
-
-  //dataReady = true;
+	// Check the conversion hasn't been started already
+	if (!adcStarted)
+	{
+		adcStarted = true;
+		digitalWrite(SHARP_LED_POWER,LOW); // power on the LED
+		delayMicroseconds(samplingTime);
+		// start the conversion
+		ADCSRA |= bit (ADSC) | bit (ADIE);
+		delayMicroseconds(deltaTime);
+		digitalWrite(SHARP_LED_POWER,HIGH); // turn the LED off
+	}
 }
 
 void loop()
@@ -164,7 +153,7 @@ void loop()
     dustDensity = 172 * voltage - 100; // ug/m3
 
     DateTime now = rtc.now();
-    sprintf(filePath, "/DATA/%04d%02d%02d.csv", now.year(), now.month(), now.day());
+    sprintf(filePath, "/GP2Y1014/%04d%02d%02d.csv", now.year(), now.month(), now.day());
 
     logFile = SD.open(filePath, FILE_WRITE);
 
@@ -180,16 +169,11 @@ void loop()
 
       logFile.print(dustDensity, 2);
       logFile.print(",");
-      logFile.print(lpFilter25.process(dustDensity), 2);
-      logFile.print(",");
-      logFile.print(lpFilter01.process(dustDensity), 2);
-      logFile.print(",");
-      logFile.print(lpFilter005.process(dustDensity), 2);
-      logFile.print(",");
-      logFile.print(lpFilter002.process(dustDensity), 2);
-      logFile.print(",");
-      logFile.println(voltage, 3);
 
+      logFile.print(ma.process(dustDensity), 2);
+      logFile.print(",");
+
+      logFile.println(voltage);
 
       logFile.close();
     }

@@ -520,10 +520,10 @@ environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.BOARD_NA
 environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.BOARD_NAME/value=Arduino Nano
 environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.COM_PORT/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.COM_PORT/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.COM_PORT/value=/dev/cu.wchusbserial14420
+environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.COM_PORT/value=/dev/cu.wchusbserial145340
 environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.ECLIPSE_LOCATION/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.ECLIPSE_LOCATION/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.ECLIPSE_LOCATION/value=${eclipse_home}/////////////////////////////////////////////////////
+environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.ECLIPSE_LOCATION/value=${eclipse_home}////////////////////////////////////////////////////////////////////////////////////////////////////////////
 environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.EXTRA.ALL/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.EXTRA.ALL/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1460967392/JANTJE.EXTRA.ALL/value=
